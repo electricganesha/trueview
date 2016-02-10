@@ -358,96 +358,9 @@ sbFragmentShader = [
           obj.traverse(function(child) {
             childrenSize = obj.children.length;
             if (child instanceof THREE.Mesh && noneSelected) {
-              var outlineMesh = new THREE.Mesh( child.geometry, outlineMaterial );
+              var outlineMesh = child.clone();
+              outlineMesh.material = outlineMaterial;
 
-              // calculate centroid
-              child.geometry.computeBoundingBox();
-              var centroid = new THREE.Vector3();
-              centroid.addVectors( child.geometry.boundingBox.min, child.geometry.boundingBox.max );
-              //centroid.multiplyScalar( 0.5 );
-
-              centroid.applyMatrix4( child.matrixWorld );
-
-              if(child.name.indexOf("Replacers") > -1)
-              {
-                switch(child.name)
-                {
-                  case("models/VRSTAND/Replacers/Double_TV/OBJ_REP_DoubleTV"):
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y-24;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = -child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/IDU/OBJ_REP_IDU"):
-                  outlineMesh.position.x = centroid.x-12;
-                  outlineMesh.position.y = centroid.y-3;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/Banco/chairsw"):
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y-27;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/Controler/OBJ_REP_Controler3"):
-                  outlineMesh.position.x = centroid.x+8;
-                  outlineMesh.position.y = centroid.y;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/PSVRPino/OBJ_REP_PSVR_PINO"):
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/PSVRMesa/OBJ_REP_PSVR_Mesa"):
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/PlateiaBanco/OBJ_REP_Plateia_Bancos"):
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y-3;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  case("models/VRSTAND/Replacers/MesasLiga/OBJ_LIGA_MESAS"):
-                  outlineMesh.position.x = centroid.x+20;
-                  outlineMesh.position.y = centroid.y+5;
-                  outlineMesh.position.z = centroid.z+20;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  break;
-                  default:
-                  outlineMesh.position.x = centroid.x;
-                  outlineMesh.position.y = centroid.y-20;
-                  outlineMesh.position.z = centroid.z;
-                  outlineMesh.rotation.x = child.rotation.x;
-                  outlineMesh.rotation.y = child.rotation.y;
-                  outlineMesh.rotation.z = child.rotation.z;
-                  }
-
-              }
-              else
-                outlineMesh.position = child.position;
               outlineMeshObject.name = "temporaryOutlineMesh";
 
               if(childrenSize != outlineMeshObject.children.length)
