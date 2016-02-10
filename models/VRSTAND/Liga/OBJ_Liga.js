@@ -19,7 +19,7 @@
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "MAT_Liga",
-	"colorDiffuse" : [0.588, 0.588, 0.588],
+	"colorDiffuse" : [0.58, 0.58, 0.58],
 	"colorSpecular" : [0.0, 0.0, 0.0],
 	"illumination" : 2,
 	"mapDiffuse" : "TEX_Liga_S.jpg",
