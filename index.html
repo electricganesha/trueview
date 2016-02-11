@@ -419,9 +419,14 @@ sbFragmentShader = [
                             // if there is one (or more) intersections
                             if ( intersects.length > 0 )
                             {
-                                var clickedObject = intersects[ 0 ].object.parent;
+                                var clickedObject = intersects[ 0 ].object;
                                 currentlySelectedObject = clickedObject;
                                 bbox = getCompoundBoundingBox(clickedObject);
+
+                                /*var bboxx = new THREE.BoundingBoxHelper( bbox, 0x00ff00 );
+                                bboxx.update();
+                                scene.add( bboxx );*/
+
                                 var point = bbox.center();
                                 setupTweenIn(point.x,point.y,point.z,clickedObject);
                                 //tween.start();
@@ -1068,7 +1073,7 @@ sbFragmentShader = [
 
 
       function getCompoundBoundingBox(object3D) {
-        var box = null;
+        var box = new THREE.Box3();
         object3D.traverse(function (obj3D) {
           var geometry = obj3D.geometry;
           if (geometry === undefined) return;
