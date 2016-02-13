@@ -99,7 +99,6 @@ sbFragmentShader = [
 "}",
 ].join("\n");
 
-      // bla bla teste
       var annie;
 
       var runnerTexture = new THREE.ImageUtils.loadTexture( 'img/run.png' );
@@ -148,6 +147,18 @@ sbFragmentShader = [
       var controls;
 
       var mouseState;
+
+      // create the main selection menu
+      var waterMarkDiv = document.createElement('div');
+      waterMarkDiv.style.width = '200px';
+      waterMarkDiv.style.height = '82px';
+      waterMarkDiv.style.position = "absolute";
+      waterMarkDiv.id = 'watermarkDiv';
+      //waterMarkDiv.style.top = '0';
+      waterMarkDiv.style.bottom = "5%";
+      waterMarkDiv.style.left = "5%";
+      waterMarkDiv.innerHTML = "<img src='img/Push_Logo_transparente.png'> </img>";
+      document.body.appendChild(waterMarkDiv);
 
       // scene
       scene = new THREE.Scene();
@@ -201,7 +212,7 @@ sbFragmentShader = [
 
       function init() {
 
-
+        $("#textScreen").fadeOut( "slow", function() {
         statsFPS.setMode( 0 ); // 0: fps, 1: ms, 2: mb
         statsMS.setMode( 1 ); // 0: fps, 1: ms, 2: mb
         statsMB.setMode( 2 ); // 0: fps, 1: ms, 2: mb
@@ -281,7 +292,7 @@ sbFragmentShader = [
         controls.noPan = true;
         currentScene = scene;
 
-
+      });
         // POST PROCESSING
         /*var renderPass = new THREE.RenderPass(scene, camera);
                 composer.addPass( renderPass );
@@ -297,7 +308,9 @@ sbFragmentShader = [
 
 				bokehPass.renderToScreen = true;
 				composer.addPass( bokehPass );*/
-
+        $("#loadedScreen").fadeOut( "slow", function() {
+          isLoading = false;
+        });
       }
 
       function onWindowResize() {
@@ -1192,10 +1205,41 @@ sbFragmentShader = [
       THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
         if(loaded == total)
         {
-          //container.appendChild( renderer.domElement );
-          //render();
+          // create the main selection menu
+          var iDiv = document.createElement('div');
+          //iDiv.innerHTML = " Cadeiras seleccionadas : ";
+          iDiv.style.width = '100%';
+          iDiv.style.textAlign = "center";
+          iDiv.style.height = '100%';
+          iDiv.style.position = "absolute";
+          iDiv.style.background = '#000000';
+          iDiv.id = 'loadedScreen';
+          iDiv.style.top = '0';
+          iDiv.style.display = "none";
+
+          var textDiv = document.createElement('div');
+          textDiv.style.color = "white";
+          textDiv.innerHTML = " Welcome to 'Hawk : Bird-Eye Immersive Space', a PUSH Interactive experiment. <br> <br> <br> This product aims to be a novel way in presenting spaces. Indoors and outdoors, if you want to present to your clients a space, be it a fair, festival, town or country  "
+          + " with an added dimension of interaction, probably 'Hawk' is the tool you're looking for."
+          + "<br><br> Tailor-made to your needs, we can turn any space virtual and interactive. "
+          +"<br><br><br><br> Click anywhere to continue";
+          textDiv.style.width = '50%';
+          textDiv.style.textAlign = "center";
+          textDiv.style.height = '100%';
+          textDiv.style.position = "absolute";
+          textDiv.style.background = '#000000';
+          textDiv.id = 'textScreen';
+          textDiv.style.left = '24%';
+          textDiv.style.top = '30%';
+
+          iDiv.appendChild(textDiv);
+
+          document.body.appendChild(iDiv);
+          $("#loadedScreen").fadeIn("slow");
+          $( "#textScreen" ).click(function() {
+            init();
+          });
           isLoading = false;
-          init();
 
         }
       };
