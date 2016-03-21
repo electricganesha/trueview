@@ -149,6 +149,18 @@
   var controls;
 
   var mouseState;
+      // create the main selection menu
+      var waterMarkDiv = document.createElement('div');
+      waterMarkDiv.style.width = '200px';
+      waterMarkDiv.style.height = '82px';
+      waterMarkDiv.style.position = "absolute";
+      waterMarkDiv.id = 'watermarkDiv';
+      //waterMarkDiv.style.top = '0';
+      waterMarkDiv.style.bottom = "5%";
+      waterMarkDiv.style.left = "5%";
+      waterMarkDiv.innerHTML = "<img src='img/Push_Logo_transparente.png'> </img>";
+      document.body.appendChild(waterMarkDiv);
+
 
   // scene
   scene = new THREE.Scene();
@@ -295,7 +307,9 @@
     width: window.innerWidth,
     height: window.innerHeight
   } );
-
+        $("#loadedScreen").fadeOut( "slow", function() {
+          isLoading = false;
+        });
   bokehPass.renderToScreen = true;
   composer.addPass( bokehPass );*/
 
@@ -356,14 +370,13 @@ function onDocumentMouseMove( e ) {
 
     noneSelected = true;
 
-    obj.traverse(function(child) {
-      childrenSize = obj.children.length;
-      if (child instanceof THREE.Mesh && noneSelected) {
+          obj.traverse(function(child) {
+            childrenSize = obj.children.length;
+            if (child instanceof THREE.Mesh && noneSelected) {
+              var outlineMesh = child.clone();
+              outlineMesh.material = outlineMaterial;
 
-        var outlineMesh = new THREE.Mesh( child.geometry, outlineMaterial );
-
-        outlineMesh.position = child.position;
-        outlineMeshObject.name = "temporaryOutlineMesh";
+              outlineMeshObject.name = "temporaryOutlineMesh";
 
         if(childrenSize != outlineMeshObject.children.length)
         outlineMeshObject.add( outlineMesh);
@@ -390,100 +403,122 @@ function onMouseDown(e) {
 
 }
 
-function onMouseUp(e) {
-  if(mouseState == 1){
-    if(!objectSelected)
-    {
-      var vector = new THREE.Vector3();
-      vector.set(
-        2 * (event.clientX / window.innerWidth) - 1,
-        - 1 - 2 * (event.clientY / window.innerHeight),
-        0.5 );
-        vector.unproject( camera );
-        var dir = vector.sub( camera.position ).normalize();
-        var distance = - camera.position.z / dir.z;
-        var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-        console.log(pos);
-        var intersectedOne = false;
-        var intersectedObject = new THREE.Object3D();
-        var mouse = new THREE.Vector2();
-        var raycaster = new THREE.Raycaster();
-        //mouse.x = ( event.clientX - windowHalfX ) / 2;
-        //mouse.y = ( event.clientY - windowHalfY ) / 2;
-        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
-        mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
-        raycaster.setFromCamera( mouse, camera );
-        var selectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1, wireframe: true} );
-        //var unselectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1} );
-        var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
-        //octreeObjects = octree.search( raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction );
-        //var intersects = raycaster.intersectOctreeObjects( octreeObjects ,true);
-        // if there is one (or more) intersections
-        if ( intersects.length > 0 )
-        {
-          var clickedObject = intersects[ 0 ].object.parent;
-          currentlySelectedObject = clickedObject;
-          bbox = getCompoundBoundingBox(clickedObject);
-          var point = bbox.center();
-          setupTweenIn(point.x,point.y,point.z,clickedObject);
-          //tween.start();
-          dist = window.innerHeight / 2 / Math.tan(Math.PI * 45 / 360);
-          //camera.position.x = position.x;
-          //camera.position.y = position.y+500;
-          //camera.position.z = position.z+500;
-          var iDiv = document.createElement('div');
-          /*iDiv.style.position = 'absolute';
-          iDiv.style.left = '70%';
-          iDiv.style.right = '5%';
-          iDiv.style.margin = '2px';
-          iDiv.style.top = '30vh';
-          iDiv.width = '200px';
-          iDiv.height = '200px';
-          iDiv.id = 'tempID';
-          iDiv.style.background = "rgba(255,255,255,0.2)";
-          iDiv.style.color = "#ffffff";*/
-          iDiv.style.width = '300px';
-          iDiv.style.margin =  '20px';
-          iDiv.style.padding = '10px';
-          iDiv.style.position = "absolute";
-          iDiv.style.display = 'inline-block';
-          iDiv.style.background = '-webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1,#f3f3f3))';
-          iDiv.style.border = '1px solid #ccc';
-          iDiv.style.boxShadow = '0px 3px 30px rgba(0, 0, 0, 0.1) inset';
-          iDiv.style.borderBottomRightRadius = '6px 50px';
-          iDiv.id = 'tempID';
-          iDiv.style.left = '70%';
-          iDiv.style.right = '5%';
-          iDiv.style.top = '30vh';
-          iDiv.style.display = 'none';
-          document.body.appendChild(iDiv);
-          $( "#tempID" ).fadeIn(1000);
-          //
-          console.log($( "#tempID" )[0]);
-          var textoBancada = " STAR WARS \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-          var textoDestiny = " DESTINY \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-          var textoFIFA = " COD \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-          var textoDisney = " PSVR \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-          console.log(clickedObject.name);
-          if(clickedObject.name.indexOf("OBJ_SW") > -1)
-          iDiv.innerHTML = textoBancada;
-          else if(clickedObject.name.indexOf("OBJ_Dest") > -1)
-          iDiv.innerHTML = textoDestiny;
-          else if(clickedObject.name.indexOf("OBJ_COD") > -1)
-          iDiv.innerHTML = textoFIFA;
-          else if(clickedObject.name.indexOf("OBJ_PSVR") > -1)
-          iDiv.innerHTML = textoDisney;
-          else
-          iDiv.innerHTML = textoBancada;
-          objectSelected = true;
-          document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-          var selectedObject = scene.getObjectByName("temporaryOutlineMesh");
-          while ( selectedObject != undefined ) {
-            scene.remove( selectedObject );
-            selectedObject = scene.getObjectByName('temporaryOutlineMesh');
-          }
-          //clickedObject.geometry.computeBoundingBox();
-          //var point = clickedObject.geometry.boundingBox.center;
+      function onMouseUp(e) {
+            if(mouseState == 1){
+                if(!objectSelected)
+                    {
+                        var vector = new THREE.Vector3();
+                        vector.set(
+                            2 * (event.clientX / window.innerWidth) - 1,
+                            - 1 - 2 * (event.clientY / window.innerHeight),
+                            0.5 );
+                        vector.unproject( camera );
+                        var dir = vector.sub( camera.position ).normalize();
+                        var distance = - camera.position.z / dir.z;
+                        var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+                        console.log(pos);
+                        var intersectedOne = false;
+                        var intersectedObject = new THREE.Object3D();
+                        var mouse = new THREE.Vector2();
+                        var raycaster = new THREE.Raycaster();
+                        //mouse.x = ( event.clientX - windowHalfX ) / 2;
+                        //mouse.y = ( event.clientY - windowHalfY ) / 2;
+                        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
+                        mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
+                        raycaster.setFromCamera( mouse, camera );
+                        var selectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1, wireframe: true} );
+                        //var unselectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1} );
+                        var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
+                        //octreeObjects = octree.search( raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction );
+                        //var intersects = raycaster.intersectOctreeObjects( octreeObjects ,true);
+                            // if there is one (or more) intersections
+                            if ( intersects.length > 0 )
+                            {
+                                var clickedObject = intersects[ 0 ].object;
+                                currentlySelectedObject = clickedObject;
+                                bbox = getCompoundBoundingBox(clickedObject);
+
+                                /*var bboxx = new THREE.BoundingBoxHelper( bbox, 0x00ff00 );
+                                bboxx.update();
+                                scene.add( bboxx );*/
+
+                                var point = bbox.center();
+                                setupTweenIn(point.x,point.y,point.z,clickedObject);
+                                //tween.start();
+                                dist = window.innerHeight / 2 / Math.tan(Math.PI * 45 / 360);
+                                //camera.position.x = position.x;
+                                //camera.position.y = position.y+500;
+                                //camera.position.z = position.z+500;
+                                var iDiv = document.createElement('div');
+                                /*iDiv.style.position = 'absolute';
+                                iDiv.style.left = '70%';
+                                iDiv.style.right = '5%';
+                                iDiv.style.margin = '2px';
+                                iDiv.style.top = '30vh';
+                                iDiv.width = '200px';
+                                iDiv.height = '200px';
+                                iDiv.id = 'tempID';
+                                iDiv.style.background = "rgba(255,255,255,0.2)";
+                                iDiv.style.color = "#ffffff";*/
+                                iDiv.style.width = '300px';
+                                iDiv.style.margin =  '20px';
+                                iDiv.style.padding = '10px';
+                                iDiv.style.position = "absolute";
+                                iDiv.style.display = 'inline-block';
+                                iDiv.style.background = '-webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1,#f3f3f3))';
+                                iDiv.style.border = '1px solid #ccc';
+                                iDiv.style.boxShadow = '0px 3px 30px rgba(0, 0, 0, 0.1) inset';
+                                iDiv.style.borderBottomRightRadius = '6px 50px';
+                                iDiv.id = 'tempID';
+                                iDiv.style.left = '70%';
+                                iDiv.style.right = '5%';
+                                iDiv.style.top = '30vh';
+                                iDiv.style.display = 'none';
+                                document.body.appendChild(iDiv);
+                                $( "#tempID" ).fadeIn(1000);
+                                //
+                                console.log($( "#tempID" )[0]);
+                                var textoBancada = " STAR WARS \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+                                var textoDestiny = " DESTINY \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+                                var textoFIFA = " COD \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+                                var textoDisney = " PSVR \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+                                console.log(clickedObject.name);
+                                if(clickedObject.name.indexOf("OBJ_SW") > -1)
+                                    iDiv.innerHTML = textoBancada;
+                                else if(clickedObject.name.indexOf("OBJ_Dest") > -1)
+                                    iDiv.innerHTML = textoDestiny;
+                                else if(clickedObject.name.indexOf("OBJ_COD") > -1)
+                                    iDiv.innerHTML = textoFIFA;
+                                else if(clickedObject.name.indexOf("OBJ_PSVR") > -1)
+                                    iDiv.innerHTML = textoDisney;
+                                else
+                                    iDiv.innerHTML = textoBancada;
+                                objectSelected = true;
+                                document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+                                var selectedObject = scene.getObjectByName("temporaryOutlineMesh");
+                                while ( selectedObject != undefined ) {
+                                    scene.remove( selectedObject );
+                                    selectedObject = scene.getObjectByName('temporaryOutlineMesh');
+                                }
+                                //clickedObject.geometry.computeBoundingBox();
+                                //var point = clickedObject.geometry.boundingBox.center;
+                            }
+                        }
+            else
+            {
+              controls.autoRotate = false;
+                $( "#tempID" ).fadeOut(1000);
+             var selectedObject = scene.getObjectByName("Ground",true);
+             setupTweenOut(selectedObject.geometry.centroid.x,selectedObject.geometry.centroid.y+1500,selectedObject.geometry.centroid.z,selectedObject);
+             /*camera.position.z = selectedObject.geometry.centroid.z;
+             camera.position.y = selectedObject.geometry.centroid.y+1500;
+             camera.position.x = selectedObject.geometry.centroid.x;*/
+             controls.target = new THREE.Vector3(selectedObject.geometry.centroid.x+50, selectedObject.geometry.centroid.y, selectedObject.geometry.centroid.z+50);
+            //document.getElementById("tempID").remove();
+            objectSelected = false;
+            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+            }
+           }
         }
       }
       else
@@ -575,7 +610,7 @@ function onMouseUp(e) {
 
     pathArrayJSCOD = ['models/VRSTAND/COD/OBJ_COD_1','models/VRSTAND/COD/OBJ_COD_2'];
 
-    pathArrayJSLiga = ['models/VRSTAND/Liga/OBJ_Liga'];
+        pathArrayJSLiga = ['models/VRSTAND/Liga/OBJ_Liga','models/VRSTAND/Liga/OBJ_LIGA_TV', 'models/VRSTAND/Liga/OBJ_Liga_Coluna'];
 
     pathArrayJSPSVR = ['models/VRSTAND/PSVR/OBJ_PSVR','models/VRSTAND/PSVR/OBJ_PSVR_Linha'];
 
@@ -599,27 +634,31 @@ function onMouseUp(e) {
 
     pathArrayReplacersSWName = ['models/VRSTAND/Replacers/Double_TV/OBJ_REP_DoubleTV'];
 
-    pathArrayReplacersPSVR = ['models/VRSTAND/PSVR/PC_PSVR_Pinos','models/VRSTAND/PSVR/PC_PSVR_Mesas']
+        pathArrayReplacersPSVR = ['models/VRSTAND/PSVR/PC_PSVR_Pinos','models/VRSTAND/PSVR/PC_PSVR_Mesas','models/VRSTAND/PSVR/PC_PSVR_Luzes']
 
-    pathArrayReplacersPSVRName = ['models/VRSTAND/PSVR/OBJ_REP_PSVR_PINO','models/VRSTAND/PSVR/OBJ_REP_PSVR_Mesa'];
+        pathArrayReplacersPSVRName = ['models/VRSTAND/Replacers/PSVRPino/OBJ_REP_PSVR_PINO','models/VRSTAND/Replacers/PSVRMesa/OBJ_REP_PSVR_Mesa','models/VRSTAND/Replacers/PSVRLuz/OBJ_PSVR_LUZ'];
 
     pathArrayReplacersLiga = ['models/VRSTAND/Liga/PC_Liga_Mesas']
 
-    pathArrayReplacersLigaName = ['models/VRSTAND/Liga/OBJ_LIGA_MESAS'];
+        pathArrayReplacersLigaName = ['models/VRSTAND/Replacers/MesasLiga/OBJ_LIGA_MESAS'];
 
     pathArrayReplacersPlateia = ['models/VRSTAND/Plateia/PC_Plateia_Bancos']
 
-    pathArrayReplacersPlateiaName = ['models/VRSTAND/Plateia/OBJ_REP_Plateia_Bancos'];
+        pathArrayReplacersPlateiaName = ['models/VRSTAND/Replacers/PlateiaBanco/OBJ_REP_Plateia_Bancos'];
 
     pathArrayReplacersGD = ['models/VRSTAND/GD/PC_GD_Truss']
 
-    pathArrayReplacersGDName = ['models/VRSTAND/GD/OBJ_REP_Truss'];
+        pathArrayReplacersGDName = ['models/VRSTAND/Replacers/Truss/OBJ_REP_Truss'];
 
     pathArrayReplacersMix = ['models/VRSTAND/Mix/PC_IDU_MIX']
 
     pathArrayReplacersMixName = ['models/VRSTAND/Replacers/IDU/OBJ_REP_IDU'];
 
     var destiny = new THREE.Object3D();
+        pathArrayReplacersDestiny = ['models/VRSTAND/Dest/PC_DEST_Bancos']
+
+        pathArrayReplacersDestinyName = ['models/VRSTAND/Replacers/Banco/chairsw'];
+
 
     for(i = 0 ; i<pathArrayJSDestiny.length ; i++)
     {
@@ -675,60 +714,63 @@ function onMouseUp(e) {
       gd = loadObjectJSON(pathArrayJSGD[i],gd);
     }
 
-    var fifa = new THREE.Object3D();
-    for(i = 0 ; i<pathArrayReplacersFIFA.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersFIFA[i],pathArrayReplacersFIFAName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersFIFA.length ; i++)
+        {
+          sw = loadReplacersWithPointCloud(pathArrayReplacersFIFA[i],pathArrayReplacersFIFAName[i],sw);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersCOD.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersCOD[i],pathArrayReplacersCODName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersCOD.length ; i++)
+        {
+          cod = loadReplacersWithPointCloud(pathArrayReplacersCOD[i],pathArrayReplacersCODName[i],cod);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersSW.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersSW[i],pathArrayReplacersSWName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersSW.length ; i++)
+        {
+          sw = loadReplacersWithPointCloud(pathArrayReplacersSW[i],pathArrayReplacersSWName[i],sw);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersLiga.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersLiga[i],pathArrayReplacersLigaName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersLiga.length ; i++)
+        {
+          liga = loadReplacersWithPointCloud(pathArrayReplacersLiga[i],pathArrayReplacersLigaName[i],liga);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersPSVR.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersPSVR[i],pathArrayReplacersPSVRName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersPSVR.length ; i++)
+        {
+          psvr = loadReplacersWithPointCloud(pathArrayReplacersPSVR[i],pathArrayReplacersPSVRName[i],psvr);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersPlateia.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersPlateia[i],pathArrayReplacersPlateiaName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersPlateia.length ; i++)
+        {
+          plateia = loadReplacersWithPointCloud(pathArrayReplacersPlateia[i],pathArrayReplacersPlateiaName[i],plateia);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersGD.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersGD[i],pathArrayReplacersGDName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersGD.length ; i++)
+        {
+          gd = loadReplacersWithPointCloud(pathArrayReplacersGD[i],pathArrayReplacersGDName[i],gd);
+        }
 
-    for(i = 0 ; i<pathArrayReplacersMix.length ; i++)
-    {
-      loadReplacersWithPointCloud(pathArrayReplacersMix[i],pathArrayReplacersMixName[i],fifa);
-    }
+        for(i = 0 ; i<pathArrayReplacersMix.length ; i++)
+        {
+          mix = loadReplacersWithPointCloud(pathArrayReplacersMix[i],pathArrayReplacersMixName[i],mix);
+        }
+
+        for(i = 0 ; i<pathArrayReplacersDestiny.length ; i++)
+        {
+          destiny = loadReplacersWithPointCloud(pathArrayReplacersDestiny[i],pathArrayReplacersDestinyName[i],destiny);
 
 
 
 
 
-    interactiveObjectGroup.add(destiny);
-    interactiveObjectGroup.add(cod);
-    interactiveObjectGroup.add(liga);
-    interactiveObjectGroup.add(psvr);
-    interactiveObjectGroup.add(mix);
-    interactiveObjectGroup.add(sw);
-    interactiveObjectGroup.add(plateia);
-    interactiveObjectGroup.add(gd);
-    //interactiveObjectGroup.add(fifa);
+        interactiveObjectGroup.add(destiny);
+        interactiveObjectGroup.add(cod);
+        interactiveObjectGroup.add(liga);
+        interactiveObjectGroup.add(psvr);
+        interactiveObjectGroup.add(mix);
+        interactiveObjectGroup.add(sw);
+        interactiveObjectGroup.add(plateia);
+        interactiveObjectGroup.add(gd);
+        ///interactiveObjectGroup.add(fifa);
 
   }
 
@@ -768,11 +810,12 @@ function onMouseUp(e) {
         }
       }
 
-      var mesh = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial(materials));
-      //mesh.castShadow = true;
-      //mesh.receiveShadow = true;
-      objectGroup.name = path+"-Name";
-      objectGroup.add(mesh);
+          var mesh = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial(materials));
+          //mesh.castShadow = true;
+          //mesh.receiveShadow = true;
+          mesh.name = path;
+          objectGroup.name = path+"-Name";
+          objectGroup.add(mesh);
 
 
 
@@ -1048,29 +1091,31 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
 
           newObject.updateMatrix();
 
-          scene.add(newObject);
-        }
+                newObject.name = replacerPath;
+                objectGroup.add(newObject);
+                //scene.add(newObject);
       }
 
-    });
-  });
-}
+          });
+        });
+        return objectGroup;
+      }
 
 
-function getCompoundBoundingBox(object3D) {
-  var box = null;
-  object3D.traverse(function (obj3D) {
-    var geometry = obj3D.geometry;
-    if (geometry === undefined) return;
-    geometry.computeBoundingBox();
-    if (box === null) {
-      box = geometry.boundingBox;
-    } else {
-      box.union(geometry.boundingBox);
-    }
-  });
-  return box;
-}
+      function getCompoundBoundingBox(object3D) {
+        var box = new THREE.Box3();
+        object3D.traverse(function (obj3D) {
+          var geometry = obj3D.geometry;
+          if (geometry === undefined) return;
+          geometry.computeBoundingBox();
+          if (box === null) {
+            box = geometry.boundingBox;
+          } else {
+            box.union(geometry.boundingBox);
+          }
+        });
+        return box;
+      }
 
 function setupTweenIn(x,y,z,obj)
 {
@@ -1174,13 +1219,44 @@ function endOfTweenIn(x,y,z) {
 }
 
 
-THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
-  if(loaded == total)
-  {
-    //container.appendChild( renderer.domElement );
-    //render();
-    isLoading = false;
-    init();
+      THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
+        if(loaded == total)
+        {
+          // create the main selection menu
+          var iDiv = document.createElement('div');
+          //iDiv.innerHTML = " Cadeiras seleccionadas : ";
+          iDiv.style.width = '100%';
+          iDiv.style.textAlign = "center";
+          iDiv.style.height = '100%';
+          iDiv.style.position = "absolute";
+          iDiv.style.background = '#000000';
+          iDiv.id = 'loadedScreen';
+          iDiv.style.top = '0';
+          iDiv.style.display = "none";
+
+          var textDiv = document.createElement('div');
+          textDiv.style.color = "white";
+          textDiv.innerHTML = " Welcome to 'Hawk : Bird-Eye Immersive Space', a PUSH Interactive experiment. <br> <br> <br> This product aims to be a novel way in presenting spaces. Indoors and outdoors, if you want to present to your clients a space, be it a fair, festival, town or country  "
+          + " with an added dimension of interaction, probably 'Hawk' is the tool you're looking for."
+          + "<br><br> Tailor-made to your needs, we can turn any space virtual and interactive. "
+          +"<br><br><br><br> Click anywhere to continue";
+          textDiv.style.width = '50%';
+          textDiv.style.textAlign = "center";
+          textDiv.style.height = '100%';
+          textDiv.style.position = "absolute";
+          textDiv.style.background = '#000000';
+          textDiv.id = 'textScreen';
+          textDiv.style.left = '24%';
+          textDiv.style.top = '30%';
+
+          iDiv.appendChild(textDiv);
+
+          document.body.appendChild(iDiv);
+          $("#loadedScreen").fadeIn("slow");
+          $( "#textScreen" ).click(function() {
+            init();
+          });
+          isLoading = false;
 
   }
 };
