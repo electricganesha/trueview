@@ -149,17 +149,17 @@
   var controls;
 
   var mouseState;
-      // create the main selection menu
-      var waterMarkDiv = document.createElement('div');
-      waterMarkDiv.style.width = '200px';
-      waterMarkDiv.style.height = '82px';
-      waterMarkDiv.style.position = "absolute";
-      waterMarkDiv.id = 'watermarkDiv';
-      //waterMarkDiv.style.top = '0';
-      waterMarkDiv.style.bottom = "5%";
-      waterMarkDiv.style.left = "5%";
-      waterMarkDiv.innerHTML = "<img src='img/Push_Logo_transparente.png'> </img>";
-      document.body.appendChild(waterMarkDiv);
+  // create the main selection menu
+  var waterMarkDiv = document.createElement('div');
+  waterMarkDiv.style.width = '200px';
+  waterMarkDiv.style.height = '82px';
+  waterMarkDiv.style.position = "absolute";
+  waterMarkDiv.id = 'watermarkDiv';
+  //waterMarkDiv.style.top = '0';
+  waterMarkDiv.style.bottom = "5%";
+  waterMarkDiv.style.left = "5%";
+  waterMarkDiv.innerHTML = "<img src='img/Push_Logo_transparente.png'> </img>";
+  document.body.appendChild(waterMarkDiv);
 
 
   // scene
@@ -296,7 +296,7 @@
 
 
     // POST PROCESSING
-    /*var renderPass = new THREE.RenderPass(scene, camera);
+    var renderPass = new THREE.RenderPass(scene, camera);
     composer.addPass( renderPass );
 
     var bokehPass = new THREE.BokehPass( scene, camera, {
@@ -307,11 +307,11 @@
     width: window.innerWidth,
     height: window.innerHeight
   } );
-        $("#loadedScreen").fadeOut( "slow", function() {
-          isLoading = false;
-        });
-  bokehPass.renderToScreen = true;
-  composer.addPass( bokehPass );*/
+  $("#loadedScreen").fadeOut( "slow", function() {
+  isLoading = false;
+});
+bokehPass.renderToScreen = true;
+composer.addPass( bokehPass );
 
 }
 
@@ -331,7 +331,7 @@ function onWindowResize() {
 
 
 function onDocumentMouseMove( e ) {
-  
+
   mouseState = 0;
 
   clearTimeout(mouseTimeout);
@@ -370,13 +370,13 @@ function onDocumentMouseMove( e ) {
 
     noneSelected = true;
 
-          obj.traverse(function(child) {
-            childrenSize = obj.children.length;
-            if (child instanceof THREE.Mesh && noneSelected) {
-              var outlineMesh = child.clone();
-              outlineMesh.material = outlineMaterial;
+    obj.traverse(function(child) {
+      childrenSize = obj.children.length;
+      if (child instanceof THREE.Mesh && noneSelected) {
+        var outlineMesh = child.clone();
+        outlineMesh.material = outlineMaterial;
 
-              outlineMeshObject.name = "temporaryOutlineMesh";
+        outlineMeshObject.name = "temporaryOutlineMesh";
 
         if(childrenSize != outlineMeshObject.children.length)
         outlineMeshObject.add( outlineMesh);
@@ -403,122 +403,82 @@ function onMouseDown(e) {
 
 }
 
-      function onMouseUp(e) {
-            if(mouseState == 1){
-                if(!objectSelected)
-                    {
-                        var vector = new THREE.Vector3();
-                        vector.set(
-                            2 * (event.clientX / window.innerWidth) - 1,
-                            - 1 - 2 * (event.clientY / window.innerHeight),
-                            0.5 );
-                        vector.unproject( camera );
-                        var dir = vector.sub( camera.position ).normalize();
-                        var distance = - camera.position.z / dir.z;
-                        var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-                        console.log(pos);
-                        var intersectedOne = false;
-                        var intersectedObject = new THREE.Object3D();
-                        var mouse = new THREE.Vector2();
-                        var raycaster = new THREE.Raycaster();
-                        //mouse.x = ( event.clientX - windowHalfX ) / 2;
-                        //mouse.y = ( event.clientY - windowHalfY ) / 2;
-                        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
-                        mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
-                        raycaster.setFromCamera( mouse, camera );
-                        var selectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1, wireframe: true} );
-                        //var unselectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1} );
-                        var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
-                        //octreeObjects = octree.search( raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction );
-                        //var intersects = raycaster.intersectOctreeObjects( octreeObjects ,true);
-                            // if there is one (or more) intersections
-                            if ( intersects.length > 0 )
-                            {
-                                var clickedObject = intersects[ 0 ].object;
-                                currentlySelectedObject = clickedObject;
-                                bbox = getCompoundBoundingBox(clickedObject);
+function onMouseUp(e) {
+  if(mouseState == 1){
+    if(!objectSelected)
+    {
+      var vector = new THREE.Vector3();
+      vector.set(
+        2 * (event.clientX / window.innerWidth) - 1,
+        - 1 - 2 * (event.clientY / window.innerHeight),
+        0.5 );
+        vector.unproject( camera );
+        var dir = vector.sub( camera.position ).normalize();
+        var distance = - camera.position.z / dir.z;
+        var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+        console.log(pos);
+        var intersectedOne = false;
+        var intersectedObject = new THREE.Object3D();
+        var mouse = new THREE.Vector2();
+        var raycaster = new THREE.Raycaster();
 
-                                /*var bboxx = new THREE.BoundingBoxHelper( bbox, 0x00ff00 );
-                                bboxx.update();
-                                scene.add( bboxx );*/
+        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
+        mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
+        raycaster.setFromCamera( mouse, camera );
+        var selectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1, wireframe: true} );
+        var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
+        // if there is one (or more) intersections
+        if ( intersects.length > 0 )
+        {
+          var clickedObject = intersects[ 0 ].object;
+          currentlySelectedObject = clickedObject;
+          bbox = getCompoundBoundingBox(clickedObject);
 
-                                var point = bbox.center();
-                                setupTweenIn(point.x,point.y,point.z,clickedObject);
-                                //tween.start();
-                                dist = window.innerHeight / 2 / Math.tan(Math.PI * 45 / 360);
-                                //camera.position.x = position.x;
-                                //camera.position.y = position.y+500;
-                                //camera.position.z = position.z+500;
-                                var iDiv = document.createElement('div');
-                                /*iDiv.style.position = 'absolute';
-                                iDiv.style.left = '70%';
-                                iDiv.style.right = '5%';
-                                iDiv.style.margin = '2px';
-                                iDiv.style.top = '30vh';
-                                iDiv.width = '200px';
-                                iDiv.height = '200px';
-                                iDiv.id = 'tempID';
-                                iDiv.style.background = "rgba(255,255,255,0.2)";
-                                iDiv.style.color = "#ffffff";*/
-                                iDiv.style.width = '300px';
-                                iDiv.style.margin =  '20px';
-                                iDiv.style.padding = '10px';
-                                iDiv.style.position = "absolute";
-                                iDiv.style.display = 'inline-block';
-                                iDiv.style.background = '-webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1,#f3f3f3))';
-                                iDiv.style.border = '1px solid #ccc';
-                                iDiv.style.boxShadow = '0px 3px 30px rgba(0, 0, 0, 0.1) inset';
-                                iDiv.style.borderBottomRightRadius = '6px 50px';
-                                iDiv.id = 'tempID';
-                                iDiv.style.left = '70%';
-                                iDiv.style.right = '5%';
-                                iDiv.style.top = '30vh';
-                                iDiv.style.display = 'none';
-                                document.body.appendChild(iDiv);
-                                $( "#tempID" ).fadeIn(1000);
-                                //
-                                console.log($( "#tempID" )[0]);
-                                var textoBancada = " STAR WARS \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-                                var textoDestiny = " DESTINY \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-                                var textoFIFA = " COD \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-                                var textoDisney = " PSVR \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-                                console.log(clickedObject.name);
-                                if(clickedObject.name.indexOf("OBJ_SW") > -1)
-                                    iDiv.innerHTML = textoBancada;
-                                else if(clickedObject.name.indexOf("OBJ_Dest") > -1)
-                                    iDiv.innerHTML = textoDestiny;
-                                else if(clickedObject.name.indexOf("OBJ_COD") > -1)
-                                    iDiv.innerHTML = textoFIFA;
-                                else if(clickedObject.name.indexOf("OBJ_PSVR") > -1)
-                                    iDiv.innerHTML = textoDisney;
-                                else
-                                    iDiv.innerHTML = textoBancada;
-                                objectSelected = true;
-                                document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-                                var selectedObject = scene.getObjectByName("temporaryOutlineMesh");
-                                while ( selectedObject != undefined ) {
-                                    scene.remove( selectedObject );
-                                    selectedObject = scene.getObjectByName('temporaryOutlineMesh');
-                                }
-                                //clickedObject.geometry.computeBoundingBox();
-                                //var point = clickedObject.geometry.boundingBox.center;
-                            }
-                        }
-            else
-            {
-              controls.autoRotate = false;
-                $( "#tempID" ).fadeOut(1000);
-             var selectedObject = scene.getObjectByName("Ground",true);
-             setupTweenOut(selectedObject.geometry.centroid.x,selectedObject.geometry.centroid.y+1500,selectedObject.geometry.centroid.z,selectedObject);
-             /*camera.position.z = selectedObject.geometry.centroid.z;
-             camera.position.y = selectedObject.geometry.centroid.y+1500;
-             camera.position.x = selectedObject.geometry.centroid.x;*/
-             controls.target = new THREE.Vector3(selectedObject.geometry.centroid.x+50, selectedObject.geometry.centroid.y, selectedObject.geometry.centroid.z+50);
-            //document.getElementById("tempID").remove();
-            objectSelected = false;
-            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-            }
-           }
+          var point = bbox.center();
+          setupTweenIn(point.x,point.y,point.z,clickedObject);
+          //tween.start();
+          dist = window.innerHeight / 2 / Math.tan(Math.PI * 45 / 360);
+          var iDiv = document.createElement('div');
+          iDiv.style.width = '300px';
+          iDiv.style.margin =  '20px';
+          iDiv.style.padding = '10px';
+          iDiv.style.position = "absolute";
+          iDiv.style.display = 'inline-block';
+          iDiv.style.background = '-webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1,#f3f3f3))';
+          iDiv.style.border = '1px solid #ccc';
+          iDiv.style.boxShadow = '0px 3px 30px rgba(0, 0, 0, 0.1) inset';
+          iDiv.style.borderBottomRightRadius = '6px 50px';
+          iDiv.id = 'tempID';
+          iDiv.style.left = '70%';
+          iDiv.style.right = '5%';
+          iDiv.style.top = '30vh';
+          iDiv.style.display = 'none';
+          document.body.appendChild(iDiv);
+          $( "#tempID" ).fadeIn(1000);
+          //
+          console.log($( "#tempID" )[0]);
+          var textoBancada = " STAR WARS \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+          var textoDestiny = " DESTINY \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+          var textoFIFA = " COD \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+          var textoDisney = " PSVR \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
+          console.log(clickedObject.name);
+          if(clickedObject.name.indexOf("OBJ_SW") > -1)
+          iDiv.innerHTML = textoBancada;
+          else if(clickedObject.name.indexOf("OBJ_Dest") > -1)
+          iDiv.innerHTML = textoDestiny;
+          else if(clickedObject.name.indexOf("OBJ_COD") > -1)
+          iDiv.innerHTML = textoFIFA;
+          else if(clickedObject.name.indexOf("OBJ_PSVR") > -1)
+          iDiv.innerHTML = textoDisney;
+          else
+          iDiv.innerHTML = textoBancada;
+          objectSelected = true;
+          document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+          var selectedObject = scene.getObjectByName("temporaryOutlineMesh");
+          while ( selectedObject != undefined ) {
+            scene.remove( selectedObject );
+            selectedObject = scene.getObjectByName('temporaryOutlineMesh');
+          }
         }
       }
       else
@@ -527,11 +487,7 @@ function onMouseDown(e) {
         $( "#tempID" ).fadeOut(1000);
         var selectedObject = scene.getObjectByName("Ground",true);
         setupTweenOut(selectedObject.geometry.centroid.x,selectedObject.geometry.centroid.y+1500,selectedObject.geometry.centroid.z,selectedObject);
-        /*camera.position.z = selectedObject.geometry.centroid.z;
-        camera.position.y = selectedObject.geometry.centroid.y+1500;
-        camera.position.x = selectedObject.geometry.centroid.x;*/
         controls.target = new THREE.Vector3(selectedObject.geometry.centroid.x+50, selectedObject.geometry.centroid.y, selectedObject.geometry.centroid.z+50);
-        //document.getElementById("tempID").remove();
         objectSelected = false;
         document.addEventListener( 'mousemove', onDocumentMouseMove, false );
       }
@@ -610,7 +566,7 @@ function onMouseDown(e) {
 
     pathArrayJSCOD = ['models/VRSTAND/COD/OBJ_COD_1','models/VRSTAND/COD/OBJ_COD_2'];
 
-        pathArrayJSLiga = ['models/VRSTAND/Liga/OBJ_Liga','models/VRSTAND/Liga/OBJ_LIGA_TV', 'models/VRSTAND/Liga/OBJ_Liga_Coluna'];
+    pathArrayJSLiga = ['models/VRSTAND/Liga/OBJ_Liga','models/VRSTAND/Liga/OBJ_LIGA_TV', 'models/VRSTAND/Liga/OBJ_Liga_Coluna'];
 
     pathArrayJSPSVR = ['models/VRSTAND/PSVR/OBJ_PSVR','models/VRSTAND/PSVR/OBJ_PSVR_Linha'];
 
@@ -634,30 +590,30 @@ function onMouseDown(e) {
 
     pathArrayReplacersSWName = ['models/VRSTAND/Replacers/Double_TV/OBJ_REP_DoubleTV'];
 
-        pathArrayReplacersPSVR = ['models/VRSTAND/PSVR/PC_PSVR_Pinos','models/VRSTAND/PSVR/PC_PSVR_Mesas','models/VRSTAND/PSVR/PC_PSVR_Luzes']
+    pathArrayReplacersPSVR = ['models/VRSTAND/PSVR/PC_PSVR_Pinos','models/VRSTAND/PSVR/PC_PSVR_Mesas','models/VRSTAND/PSVR/PC_PSVR_Luzes']
 
-        pathArrayReplacersPSVRName = ['models/VRSTAND/Replacers/PSVRPino/OBJ_REP_PSVR_PINO','models/VRSTAND/Replacers/PSVRMesa/OBJ_REP_PSVR_Mesa','models/VRSTAND/Replacers/PSVRLuz/OBJ_PSVR_LUZ'];
+    pathArrayReplacersPSVRName = ['models/VRSTAND/Replacers/PSVRPino/OBJ_REP_PSVR_PINO','models/VRSTAND/Replacers/PSVRMesa/OBJ_REP_PSVR_Mesa','models/VRSTAND/Replacers/PSVRLuz/OBJ_PSVR_LUZ'];
 
     pathArrayReplacersLiga = ['models/VRSTAND/Liga/PC_Liga_Mesas']
 
-        pathArrayReplacersLigaName = ['models/VRSTAND/Replacers/MesasLiga/OBJ_LIGA_MESAS'];
+    pathArrayReplacersLigaName = ['models/VRSTAND/Replacers/MesasLiga/OBJ_LIGA_MESAS'];
 
     pathArrayReplacersPlateia = ['models/VRSTAND/Plateia/PC_Plateia_Bancos']
 
-        pathArrayReplacersPlateiaName = ['models/VRSTAND/Replacers/PlateiaBanco/OBJ_REP_Plateia_Bancos'];
+    pathArrayReplacersPlateiaName = ['models/VRSTAND/Replacers/PlateiaBanco/OBJ_REP_Plateia_Bancos'];
 
     pathArrayReplacersGD = ['models/VRSTAND/GD/PC_GD_Truss']
 
-        pathArrayReplacersGDName = ['models/VRSTAND/Replacers/Truss/OBJ_REP_Truss'];
+    pathArrayReplacersGDName = ['models/VRSTAND/Replacers/Truss/OBJ_REP_Truss'];
 
     pathArrayReplacersMix = ['models/VRSTAND/Mix/PC_IDU_MIX']
 
     pathArrayReplacersMixName = ['models/VRSTAND/Replacers/IDU/OBJ_REP_IDU'];
 
     var destiny = new THREE.Object3D();
-        pathArrayReplacersDestiny = ['models/VRSTAND/Dest/PC_DEST_Bancos']
+    pathArrayReplacersDestiny = ['models/VRSTAND/Dest/PC_DEST_Bancos']
 
-        pathArrayReplacersDestinyName = ['models/VRSTAND/Replacers/Banco/chairsw'];
+    pathArrayReplacersDestinyName = ['models/VRSTAND/Replacers/Banco/chairsw'];
 
 
     for(i = 0 ; i<pathArrayJSDestiny.length ; i++)
@@ -714,274 +670,197 @@ function onMouseDown(e) {
       gd = loadObjectJSON(pathArrayJSGD[i],gd);
     }
 
-        for(i = 0 ; i<pathArrayReplacersFIFA.length ; i++)
-        {
-          sw = loadReplacersWithPointCloud(pathArrayReplacersFIFA[i],pathArrayReplacersFIFAName[i],sw);
-        }
+    for(i = 0 ; i<pathArrayReplacersFIFA.length ; i++)
+    {
+      sw = loadReplacersWithPointCloud(pathArrayReplacersFIFA[i],pathArrayReplacersFIFAName[i],sw);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersCOD.length ; i++)
-        {
-          cod = loadReplacersWithPointCloud(pathArrayReplacersCOD[i],pathArrayReplacersCODName[i],cod);
-        }
+    for(i = 0 ; i<pathArrayReplacersCOD.length ; i++)
+    {
+      cod = loadReplacersWithPointCloud(pathArrayReplacersCOD[i],pathArrayReplacersCODName[i],cod);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersSW.length ; i++)
-        {
-          sw = loadReplacersWithPointCloud(pathArrayReplacersSW[i],pathArrayReplacersSWName[i],sw);
-        }
+    for(i = 0 ; i<pathArrayReplacersSW.length ; i++)
+    {
+      sw = loadReplacersWithPointCloud(pathArrayReplacersSW[i],pathArrayReplacersSWName[i],sw);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersLiga.length ; i++)
-        {
-          liga = loadReplacersWithPointCloud(pathArrayReplacersLiga[i],pathArrayReplacersLigaName[i],liga);
-        }
+    for(i = 0 ; i<pathArrayReplacersLiga.length ; i++)
+    {
+      liga = loadReplacersWithPointCloud(pathArrayReplacersLiga[i],pathArrayReplacersLigaName[i],liga);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersPSVR.length ; i++)
-        {
-          psvr = loadReplacersWithPointCloud(pathArrayReplacersPSVR[i],pathArrayReplacersPSVRName[i],psvr);
-        }
+    for(i = 0 ; i<pathArrayReplacersPSVR.length ; i++)
+    {
+      psvr = loadReplacersWithPointCloud(pathArrayReplacersPSVR[i],pathArrayReplacersPSVRName[i],psvr);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersPlateia.length ; i++)
-        {
-          plateia = loadReplacersWithPointCloud(pathArrayReplacersPlateia[i],pathArrayReplacersPlateiaName[i],plateia);
-        }
+    for(i = 0 ; i<pathArrayReplacersPlateia.length ; i++)
+    {
+      plateia = loadReplacersWithPointCloud(pathArrayReplacersPlateia[i],pathArrayReplacersPlateiaName[i],plateia);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersGD.length ; i++)
-        {
-          gd = loadReplacersWithPointCloud(pathArrayReplacersGD[i],pathArrayReplacersGDName[i],gd);
-        }
+    for(i = 0 ; i<pathArrayReplacersGD.length ; i++)
+    {
+      gd = loadReplacersWithPointCloud(pathArrayReplacersGD[i],pathArrayReplacersGDName[i],gd);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersMix.length ; i++)
-        {
-          mix = loadReplacersWithPointCloud(pathArrayReplacersMix[i],pathArrayReplacersMixName[i],mix);
-        }
+    for(i = 0 ; i<pathArrayReplacersMix.length ; i++)
+    {
+      mix = loadReplacersWithPointCloud(pathArrayReplacersMix[i],pathArrayReplacersMixName[i],mix);
+    }
 
-        for(i = 0 ; i<pathArrayReplacersDestiny.length ; i++)
-        {
-          destiny = loadReplacersWithPointCloud(pathArrayReplacersDestiny[i],pathArrayReplacersDestinyName[i],destiny);
-
-
-
+    for(i = 0 ; i<pathArrayReplacersDestiny.length ; i++)
+    {
+      destiny = loadReplacersWithPointCloud(pathArrayReplacersDestiny[i],pathArrayReplacersDestinyName[i],destiny);
+          }
 
 
-        interactiveObjectGroup.add(destiny);
-        interactiveObjectGroup.add(cod);
-        interactiveObjectGroup.add(liga);
-        interactiveObjectGroup.add(psvr);
-        interactiveObjectGroup.add(mix);
-        interactiveObjectGroup.add(sw);
-        interactiveObjectGroup.add(plateia);
-        interactiveObjectGroup.add(gd);
-        ///interactiveObjectGroup.add(fifa);
+
+
+      interactiveObjectGroup.add(destiny);
+      interactiveObjectGroup.add(cod);
+      interactiveObjectGroup.add(liga);
+      interactiveObjectGroup.add(psvr);
+      interactiveObjectGroup.add(mix);
+      interactiveObjectGroup.add(sw);
+      interactiveObjectGroup.add(plateia);
+      interactiveObjectGroup.add(gd);
+      ///interactiveObjectGroup.add(fifa);
+
 
   }
 
-  function loadObject(path)
-  {
-    var loaderOBJ = new THREE.OBJMTLLoader();
-    loaderOBJ.load( path+'.obj', path+'.mtl', function ( object ) {
-      bancada.add(object);
-      //}
-      //});
+    function loadObject(path)
+    {
+      var loaderOBJ = new THREE.OBJMTLLoader();
+      loaderOBJ.load( path+'.obj', path+'.mtl', function ( object ) {
+        bancada.add(object);
+        //}
+        //});
 
-    },// Function called when downloads progress
-    function ( xhr ) {
-      console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
-    // Function called when downloads error
-    function ( xhr ) {
-      console.log( 'An error happened' );
-    });
-  }
+      },// Function called when downloads progress
+      function ( xhr ) {
+        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+      },
+      // Function called when downloads error
+      function ( xhr ) {
+        console.log( 'An error happened' );
+      });
+    }
 
-  function loadObjectJSON(path,objectGroup)
-  {
-    loaderJSON = new THREE.JSONLoader();
+    function loadObjectJSON(path,objectGroup)
+    {
+      loaderJSON = new THREE.JSONLoader();
 
-    loaderJSON.load( path+".js", function( geometry, materials ) {
+      loaderJSON.load( path+".js", function( geometry, materials ) {
 
 
-      if(path.indexOf("models/VRSTAND/GD/OBJ_DetalhesGD") > -1)
-      {
-        for(var i = 0 ; i< materials.length ; i++)
+        if(path.indexOf("models/VRSTAND/GD/OBJ_DetalhesGD") > -1)
         {
-          if(materials[i].name == "Material__1960")
+          for(var i = 0 ; i< materials.length ; i++)
           {
-            materials[i].side = THREE.BackSide;
+            if(materials[i].name == "Material__1960")
+            {
+              materials[i].side = THREE.BackSide;
+            }
           }
         }
-      }
 
-          var mesh = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial(materials));
-          //mesh.castShadow = true;
-          //mesh.receiveShadow = true;
-          mesh.name = path;
-          objectGroup.name = path+"-Name";
-          objectGroup.add(mesh);
-
+        var mesh = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial(materials));
+        //mesh.castShadow = true;
+        //mesh.receiveShadow = true;
+        mesh.name = path;
+        objectGroup.name = path+"-Name";
+        objectGroup.add(mesh);
 
 
-    },// Function called when downloads progress
-    function ( xhr ) {
-      console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
-    // Function called when downloads error
-    function ( xhr ) {
-      console.log( 'An error happened' );
-    });
 
-    return objectGroup;
-  }
+      },// Function called when downloads progress
+      function ( xhr ) {
+        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+      },
+      // Function called when downloads error
+      function ( xhr ) {
+        console.log( 'An error happened' );
+      });
 
-  function loadGround()
-  {
+      return objectGroup;
+    }
 
-    var groundGeo = new THREE.PlaneBufferGeometry( 100000, 100000 );
-    //var groundTexture = THREE.ImageUtils.loadTexture( "models/Stand/Replacers/brick_pavement_0099_02_preview.jpg" );
-    //groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-    //groundTexture.repeat.set( 500, 500 );
-    var groundMat = new THREE.MeshBasicMaterial( { color: 0x000000} );
-    groundMat.color.set(0xaeadb8);
-    //groundMat.map = groundTexture ;
+    function loadGround()
+    {
 
-    var ground = new THREE.Mesh( groundGeo, groundMat );
-    ground.rotation.x = -Math.PI/2;
-    ground.position.y = -33;
-    scene.add( ground );
+      var groundGeo = new THREE.PlaneBufferGeometry( 100000, 100000 );
 
-    loader = new THREE.JSONLoader();
-    loader.load( "models/VRSTAND/Fundo/Fundo.js", function( geometry,materials ) {
-      var fundo = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
-      fundo.name = "Fundo";
-      scene.add( fundo );
-    });
+      var groundMat = new THREE.MeshBasicMaterial( { color: 0x000000} );
+      groundMat.color.set(0xaeadb8);
+      //groundMat.map = groundTexture ;
 
-    loader = new THREE.JSONLoader();
-    loader.load( "models/VRSTAND/Ground/OBJ_Ground.js", function( geometry,materials ) {
+      var ground = new THREE.Mesh( groundGeo, groundMat );
+      ground.rotation.x = -Math.PI/2;
+      ground.position.y = -33;
+      scene.add( ground );
 
-      var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
-      mesh.name = "Ground";
-      scene.add( mesh );
+      loader = new THREE.JSONLoader();
+      loader.load( "models/VRSTAND/Fundo/Fundo.js", function( geometry,materials ) {
+        var fundo = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
+        fundo.name = "Fundo";
+        scene.add( fundo );
+      });
 
-      groundHeight = mesh.position.y;
-      ground.position.y = groundHeight-30;
+      loader = new THREE.JSONLoader();
+      loader.load( "models/VRSTAND/Ground/OBJ_Ground.js", function( geometry,materials ) {
 
-      getCentroid(mesh);
+        var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
+        mesh.name = "Ground";
+        scene.add( mesh );
 
-      var centroid = new THREE.Vector3();
-      mesh.geometry.computeBoundingBox();
-      centroid.addVectors( mesh.geometry.boundingBox.min, mesh.geometry.boundingBox.max );
-      centroid.multiplyScalar( - 0.5 );
-      centroid.applyMatrix4( mesh.matrixWorld );
+        groundHeight = mesh.position.y;
+        ground.position.y = groundHeight-30;
 
-      var spotTarget = new THREE.Object3D();
-      spotTarget.position.x = centroid.x;
-      spotTarget.position.y = centroid.y;
-      spotTarget.position.z = centroid.z;
+        getCentroid(mesh);
 
-      var delta = 50;
+        var centroid = new THREE.Vector3();
+        mesh.geometry.computeBoundingBox();
+        centroid.addVectors( mesh.geometry.boundingBox.min, mesh.geometry.boundingBox.max );
+        centroid.multiplyScalar( - 0.5 );
+        centroid.applyMatrix4( mesh.matrixWorld );
 
-      var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        var spotTarget = new THREE.Object3D();
+        spotTarget.position.x = centroid.x;
+        spotTarget.position.y = centroid.y;
+        spotTarget.position.z = centroid.z;
 
-      dirLight.position.set(-100, 500, -500);
-      dirLight.target.position.set( 300, 40, -500 );
-      dirLight.target.updateMatrixWorld();
+        var delta = 50;
 
-      scene.add(dirLight);
+        var dirLight = new THREE.DirectionalLight(0xffffff, 1);
 
-      //buildings
+        dirLight.position.set(-100, 500, -500);
+        dirLight.target.position.set( 300, 40, -500 );
+        dirLight.target.updateMatrixWorld();
 
-      // build the base geometry for each building
-      var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-      // translate the geometry to place the pivot point at the bottom instead of the center
-      geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
-      // get rid of the bottom face - it is never seen
-      //geometry.faces.splice( 3, 1 );
-      //geometry.faceVertexUvs[0].splice( 3, 1 );
+        scene.add(dirLight);
 
-      // buildMesh
-      var buildingMesh= new THREE.Mesh( geometry );
+        var light = new THREE.Color( 0xffffff );
+        var shadow  = new THREE.Color( 0x303050 );
 
-      var light = new THREE.Color( 0xffffff );
-      var shadow  = new THREE.Color( 0x303050 );
+        var value = 1 - Math.random() * Math.random();
+        var baseColor = new THREE.Color().setRGB( value + Math.random() * 0.1, value, value + Math.random() * 0.1 );
 
-      var value = 1 - Math.random() * Math.random();
-      var baseColor = new THREE.Color().setRGB( value + Math.random() * 0.1, value, value + Math.random() * 0.1 );
+        // set topColor/bottom vertexColors as adjustement of baseColor
+        var topColor  = baseColor.clone().multiply( light );
+        var bottomColor = baseColor.clone().multiply( shadow );
 
-      // set topColor/bottom vertexColors as adjustement of baseColor
-      var topColor  = baseColor.clone().multiply( light );
-      var bottomColor = baseColor.clone().multiply( shadow );
-
-      var iSBrsize = 10000;
-      var uniforms = {
-        topColor: {type: "c", value: new THREE.Color(0x0077ff)}, bottomColor: {type: "c", value: new THREE.Color(0xffffff)},
-        offset: {type: "f", value: iSBrsize}, exponent: {type: "f", value: 1.5}
-      }
-      var skyGeo = new THREE.SphereGeometry(iSBrsize, 32, 32);
-      skyMat = new THREE.ShaderMaterial({vertexShader: sbVertexShader, fragmentShader: sbFragmentShader, uniforms: uniforms, side: THREE.DoubleSide, fog: false});
-      skyMesh = new THREE.Mesh(skyGeo, skyMat);
-      this.scene.add(skyMesh);
-
-
-      /*var buildingMesh= new THREE.Mesh( geometry );
-      var cityGeometry= new THREE.Geometry();
-      for(var i=0; i<100 ; i+=1)
-      {
-      var h = centroid.x+1000;
-      var k = centroid.z+1000;
-      var r = Math.abs(((Math.floor( Math.random() * 200 - 100 ) * (i))));
-      //var step = 2*Math.PI/100;
-      var step =1;
-
-      var height = 10*(i);
-
-      console.log(height);
-
-      console.log(i + " radius " + r);
-      if(r >= 1){
-      for(var theta=0; theta < 2*Math.PI; theta+=step)
-      {
-      var h = r*Math.cos(theta)+centroid.x*10;
-      var k = r*Math.cos(theta)+centroid.x*10;
-      x = (h + r*Math.cos(theta));
-      z = (k + r*Math.sin(theta));
-
-      buildingMesh.position.x   = x;
-      buildingMesh.position.z   = z;
-
-      buildingMesh.position.y = groundHeight-30;
-      // put a random rotation
-      buildingMesh.rotation.y   = centroid.y + Math.random()*Math.PI*2;
-      // put a random scale
-      buildingMesh.scale.x  = Math.random() * (Math.random() * Math.random() * Math.random() * 300 + 10) * 10;
-      //buildingMesh.scale.y  = ((Math.random() * Math.random() * Math.random() * buildingMesh.scale.x) * 8 + 8)*10;
-      buildingMesh.scale.z  = buildingMesh.scale.x;
-      buildingMesh.scale.y  = (Math.random() * (height  - (height-500)) + (height-500));
-
-      // set .vertexColors for each face
-      var geometry  = buildingMesh.geometry;
-      for ( var j = 0, jl = geometry.faces.length; j < jl; j ++ ) {
-      if ( j === 2 ) {
-      // set face.vertexColors on root face
-      geometry.faces[ j ].vertexColors = [ baseColor, baseColor, baseColor, baseColor ];
-    } else {
-    // set face.vertexColors on sides faces
-    geometry.faces[ j ].vertexColors = [ topColor, bottomColor, bottomColor, topColor ];
-  }
-}
-
-//buildingMesh.scale.set(100,100,100);
-//THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
-buildingMesh.updateMatrix();
-cityGeometry.merge(buildingMesh.geometry,buildingMesh.matrix);
-}
-}
-}*/
-
-//var cityMaterial = new THREE.MeshLambertMaterial( { /*map: buildingTexture, side: THREE.DoubleSide,*/ vertexColors  : THREE.VertexColors });
-
-/*var cityMesh = new THREE.Mesh(cityGeometry, cityMaterial );
-
-scene.add(cityMesh);*/
-
+        var iSBrsize = 10000;
+        var uniforms = {
+          topColor: {type: "c", value: new THREE.Color(0x0077ff)}, bottomColor: {type: "c", value: new THREE.Color(0xffffff)},
+          offset: {type: "f", value: iSBrsize}, exponent: {type: "f", value: 1.5}
+        }
+        var skyGeo = new THREE.SphereGeometry(iSBrsize, 32, 32);
+        skyMat = new THREE.ShaderMaterial({vertexShader: sbVertexShader, fragmentShader: sbFragmentShader, uniforms: uniforms, side: THREE.DoubleSide, fog: false});
+        skyMesh = new THREE.Mesh(skyGeo, skyMat);
+        this.scene.add(skyMesh);
 } );
 }
 
@@ -1004,13 +883,10 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
     }
   } );
 
-
   light.position.x = normalVector.x;
   light.position.y = normalVector.y;
   light.position.z = normalVector.z;
   light.lookAt(normalVector);
-
-
 
   var loaderOBJ = new THREE.OBJMTLLoader();
   loaderOBJ.load( replacerPath+'.obj', replacerPath+'.mtl', function ( object ) {
@@ -1019,15 +895,10 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
       if (child instanceof THREE.Mesh) {
         for(i=0; i<meshPointCloud.geometry.vertices.length; i++){
 
-          //var cube = new THREE.Mesh( new THREE.CubeGeometry( 10, 10, 10 ), new THREE.MeshNormalMaterial() );
-
           var vertex = meshPointCloud.geometry.vertices[i];
 
-
-          console.log(replacerPath);
           if(replacerPath.indexOf("OBJ_REP_Controler3") > -1)
           {
-            //child.material = new THREE.MeshNormalMaterial();
             var normalMapMaterial = new THREE.MeshPhongMaterial( {
               color: 0xdddddd,
               specular: 0x222222,
@@ -1057,12 +928,6 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
               annie = new TextureAnimator( runnerTexture, 10, 1, 10, 75 ); // texture, #horiz, #vert, #total, duration.
               child.material.map = runnerTexture;
               child.material.side = THREE.DoubleSide;
-              /*var runnerMaterial = new THREE.MeshBasicMaterial( { map: runnerTexture, side:THREE.DoubleSide } );
-              var runnerGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
-              var runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-              runner.position.set(-100,25,0);
-              scene.add(runner);*/
-
             }
 
           }
@@ -1080,9 +945,6 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
           newObject.castShadow = true;
           newObject.receiveShadow = true;
 
-          //var arrowHelper = new THREE.ArrowHelper( direction, origin, length, 0xffff00 );
-          //scene.add( arrowHelper );
-
           var vAxis = new THREE.Vector3( -1,0,0 );
 
           var quaternion = new THREE.Quaternion().setFromUnitVectors( vAxis.normalize(),to.normalize()  );
@@ -1091,31 +953,30 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup)
 
           newObject.updateMatrix();
 
-                newObject.name = replacerPath;
-                objectGroup.add(newObject);
-                //scene.add(newObject);
+          newObject.name = replacerPath;
+          objectGroup.add(newObject);
+        }
       }
+    });
+  });
+  return objectGroup;
+}
 
-          });
-        });
-        return objectGroup;
-      }
 
-
-      function getCompoundBoundingBox(object3D) {
-        var box = new THREE.Box3();
-        object3D.traverse(function (obj3D) {
-          var geometry = obj3D.geometry;
-          if (geometry === undefined) return;
-          geometry.computeBoundingBox();
-          if (box === null) {
-            box = geometry.boundingBox;
-          } else {
-            box.union(geometry.boundingBox);
-          }
-        });
-        return box;
-      }
+function getCompoundBoundingBox(object3D) {
+  var box = new THREE.Box3();
+  object3D.traverse(function (obj3D) {
+    var geometry = obj3D.geometry;
+    if (geometry === undefined) return;
+    geometry.computeBoundingBox();
+    if (box === null) {
+      box = geometry.boundingBox;
+    } else {
+      box.union(geometry.boundingBox);
+    }
+  });
+  return box;
+}
 
 function setupTweenIn(x,y,z,obj)
 {
@@ -1192,21 +1053,6 @@ function setupTweenOut(x,y,z,obj)
     y: y,
     z: z
   },2000).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(function () {
-    /*var centroid = new THREE.Vector3();
-    box = getCompoundBoundingBox(currentlySelectedObject);
-    var hex  = 0xff0000;
-    var bbox = new THREE.BoundingBoxHelper( currentlySelectedObject, hex );
-    bbox.update();
-    scene.add( bbox );
-    //currentlySelectedObject.geometry.computeBoundingBox();
-    centroid.addVectors( box.min, box.max );
-    centroid.multiplyScalar( - 0.5 );
-    centroid.applyMatrix4( scene.matrixWorld );
-    lookVector = new THREE.Vector3(currentlySelectedObject.position.x,currentlySelectedObject.position.y,currentlySelectedObject.position.z);
-    lookVector.applyMatrix4( currentlySelectedObject.matrixWorld );
-    //camera.lookAt(new THREE.Vector3());
-    controls.target = new THREE.Vector3(currentlySelectedObject.x, currentlySelectedObject.y, currentlySelectedObject.z);
-    console.log(camera.target);*/
   }).onComplete(function () {
     animationIsOver = true;
   }).start();
@@ -1219,44 +1065,44 @@ function endOfTweenIn(x,y,z) {
 }
 
 
-      THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
-        if(loaded == total)
-        {
-          // create the main selection menu
-          var iDiv = document.createElement('div');
-          //iDiv.innerHTML = " Cadeiras seleccionadas : ";
-          iDiv.style.width = '100%';
-          iDiv.style.textAlign = "center";
-          iDiv.style.height = '100%';
-          iDiv.style.position = "absolute";
-          iDiv.style.background = '#000000';
-          iDiv.id = 'loadedScreen';
-          iDiv.style.top = '0';
-          iDiv.style.display = "none";
+THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
+  if(loaded == total)
+  {
+    // create the main selection menu
+    var iDiv = document.createElement('div');
+    //iDiv.innerHTML = " Cadeiras seleccionadas : ";
+    iDiv.style.width = '100%';
+    iDiv.style.textAlign = "center";
+    iDiv.style.height = '100%';
+    iDiv.style.position = "absolute";
+    iDiv.style.background = '#000000';
+    iDiv.id = 'loadedScreen';
+    iDiv.style.top = '0';
+    iDiv.style.display = "none";
 
-          var textDiv = document.createElement('div');
-          textDiv.style.color = "white";
-          textDiv.innerHTML = " Welcome to 'Hawk : Bird-Eye Immersive Space', a PUSH Interactive experiment. <br> <br> <br> This product aims to be a novel way in presenting spaces. Indoors and outdoors, if you want to present to your clients a space, be it a fair, festival, town or country  "
-          + " with an added dimension of interaction, probably 'Hawk' is the tool you're looking for."
-          + "<br><br> Tailor-made to your needs, we can turn any space virtual and interactive. "
-          +"<br><br><br><br> Click anywhere to continue";
-          textDiv.style.width = '50%';
-          textDiv.style.textAlign = "center";
-          textDiv.style.height = '100%';
-          textDiv.style.position = "absolute";
-          textDiv.style.background = '#000000';
-          textDiv.id = 'textScreen';
-          textDiv.style.left = '24%';
-          textDiv.style.top = '30%';
+    var textDiv = document.createElement('div');
+    textDiv.style.color = "white";
+    textDiv.innerHTML = " Welcome to 'Hawk : Bird-Eye Immersive Space', a PUSH Interactive experiment. <br> <br> <br> This product aims to be a novel way in presenting spaces. Indoors and outdoors, if you want to present to your clients a space, be it a fair, festival, town or country  "
+    + " with an added dimension of interaction, probably 'Hawk' is the tool you're looking for."
+    + "<br><br> Tailor-made to your needs, we can turn any space virtual and interactive. "
+    +"<br><br><br><br> Click anywhere to continue";
+    textDiv.style.width = '50%';
+    textDiv.style.textAlign = "center";
+    textDiv.style.height = '100%';
+    textDiv.style.position = "absolute";
+    textDiv.style.background = '#000000';
+    textDiv.id = 'textScreen';
+    textDiv.style.left = '24%';
+    textDiv.style.top = '30%';
 
-          iDiv.appendChild(textDiv);
+    iDiv.appendChild(textDiv);
 
-          document.body.appendChild(iDiv);
-          $("#loadedScreen").fadeIn("slow");
-          $( "#textScreen" ).click(function() {
-            init();
-          });
-          isLoading = false;
+    document.body.appendChild(iDiv);
+    $("#loadedScreen").fadeIn("slow");
+    $( "#textScreen" ).click(function() {
+      init();
+    });
+    isLoading = false;
 
   }
 };
@@ -1321,7 +1167,7 @@ function TextureAnimator(texture, tilesHoriz, tilesVert, numTiles, tileDispDurat
       this.currentDisplayTime -= this.tileDisplayDuration;
       this.currentTile++;
       if (this.currentTile == this.numberOfTiles)
-      this.currentTile = 0;
+        this.currentTile = 0;
       var currentColumn = this.currentTile % this.tilesHorizontal;
       texture.offset.x = currentColumn / this.tilesHorizontal;
       var currentRow = Math.floor( this.currentTile / this.tilesHorizontal );
