@@ -54,6 +54,13 @@ $.ajax({
   async: false
 });
 
+$.ajax({
+  type: "GET",
+  url: "js/threex.rendererstats.js",
+  dataType: "script",
+  async: false
+});
+
 sbVertexShader = [
   "varying vec3 vWorldPosition;",
   "void main() {",
@@ -125,6 +132,7 @@ var mouseTimeout;
 var controls;
 
 var mouseState;
+
 // create the main selection menu
 var waterMarkDiv = document.createElement('div');
 waterMarkDiv.style.width = '200px';
@@ -137,7 +145,11 @@ waterMarkDiv.style.left = "5%";
 waterMarkDiv.innerHTML = "<img src='img/Push_Logo_transparente.png'> </img>";
 document.body.appendChild(waterMarkDiv);
 
-
+var rendererStats	= new THREEx.RendererStats();
+	rendererStats.domElement.style.position	= 'absolute';
+	rendererStats.domElement.style.left	= '0px';
+	rendererStats.domElement.style.bottom	= '0px';
+	document.body.appendChild( rendererStats.domElement );
 // scene
 scene = new THREE.Scene();
 
@@ -432,6 +444,7 @@ function onMouseUp(e) {
 function render() {
   requestAnimationFrame(render);
 
+
   statsFPS.begin();
   statsMS.begin();
   statsMB.begin();
@@ -448,6 +461,8 @@ function render() {
   var z = 20, d = 150;
 
   renderer.render( currentScene, camera );
+
+  rendererStats.update(renderer);
 
   annie.update(1000 * clock.getDelta());
 
@@ -667,17 +682,16 @@ function loadObject(path) {
   var loaderOBJ = new THREE.OBJMTLLoader();
   loaderOBJ.load( path+'.obj', path+'.mtl', function ( object ) {
     bancada.add(object);
-    //}
-    //});
+  }),
 
-  },// Function called when downloads progress
+  // Function called when downloads progress
   function ( xhr ) {
     console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
   },
   // Function called when downloads error
   function ( xhr ) {
     console.log( 'An error happened' );
-  });
+  }
 }
 
 function loadObjectJSON(path,objectGroup) {
