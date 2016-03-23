@@ -489,7 +489,7 @@ function getCentroid ( mesh ) {
 }
 
 function loadScene() {
-  scene.add(interactiveObjectGroup);
+  //scene.add(interactiveObjectGroup);
 
   pathArrayReplacers = [];
   replacersName = [];
@@ -645,7 +645,7 @@ function loadScene() {
   for(i = 0 ; i<pathArrayReplacersDestiny.length ; i++)
   {
     destiny = loadReplacersWithPointCloud(pathArrayReplacersDestiny[i],pathArrayReplacersDestinyName[i],destiny);
-        }
+  }
 
 
 
@@ -660,7 +660,31 @@ function loadScene() {
     interactiveObjectGroup.add(gd);
     ///interactiveObjectGroup.add(fifa);
 
+    console.log(destiny);
 
+    singleGeometry = new THREE.Geometry();
+    for(var i=0; i<destiny.length; i++)
+    singleGeometry.merge(destiny[i].geometry, destiny[i].matrix);
+    for(var i=0; i<cod.length; i++)
+    singleGeometry.merge(cod[i].geometry, cod[i].matrix);
+    for(var i=0; i<liga.length; i++)
+    singleGeometry.merge(liga[i].geometry, liga[i].matrix);
+    for(var i=0; i<psvr.length; i++)
+    singleGeometry.merge(psvr[i].geometry, psvr[i].matrix);
+    for(var i=0; i<mix.length; i++)
+    singleGeometry.merge(mix[i].geometry, mix[i].matrix);
+    for(var i=0; i<sw.length; i++)
+    singleGeometry.merge(sw[i].geometry, sw[i].matrix);
+    for(var i=0; i<plateia.length; i++)
+    singleGeometry.merge(plateia[i].geometry, plateia[i].matrix);
+    for(var i=0; i<gd.length; i++)
+    singleGeometry.merge(gd[i].geometry, gd[i].matrix);
+
+    console.log(singleGeometry);
+
+    var meshSG = new THREE.Mesh(singleGeometry, new THREE.MeshNormalMaterial());
+    meshSG.name = "singleGeometryNormal";
+    scene.add(meshSG);
 }
 
 function loadObject(path) {
