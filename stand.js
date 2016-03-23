@@ -133,6 +133,12 @@ var controls;
 
 var mouseState;
 
+var sceneCentroid;
+
+var singleGeometry = new THREE.Geometry();
+
+var singleGeometryMaterials = [];
+
 // create the main selection menu
 var waterMarkDiv = document.createElement('div');
 waterMarkDiv.style.width = '200px';
@@ -243,12 +249,12 @@ function init() {
 
   controls = new THREE.OrbitControls( camera );
 
-  var selectedObject = scene.getObjectByName("Ground",true);
-  camera.position.z = selectedObject.geometry.centroid.z;
-  camera.position.y = selectedObject.geometry.centroid.y+1500;
-  camera.position.x = selectedObject.geometry.centroid.x;
+  //var selectedObject = scene.getObjectByName("Ground",true);
+  camera.position.z = sceneCentroid.z;
+  camera.position.y = sceneCentroid.y+1500;
+  camera.position.x = sceneCentroid.x;
 
-  controls.target = new THREE.Vector3(selectedObject.geometry.centroid.x+50, selectedObject.geometry.centroid.y, selectedObject.geometry.centroid.z+50);
+  controls.target = new THREE.Vector3(sceneCentroid.x+50, sceneCentroid.y, sceneCentroid.z+50);
   controls.minDistance = 800;
   controls.maxDistance = 3000;
   controls.minPolarAngle = -Math.PI/2; // radians
@@ -361,7 +367,6 @@ function onMouseUp(e) {
         var dir = vector.sub( camera.position ).normalize();
         var distance = - camera.position.z / dir.z;
         var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-        console.log(pos);
         var intersectedOne = false;
         var intersectedObject = new THREE.Object3D();
         var mouse = new THREE.Vector2();
@@ -401,12 +406,10 @@ function onMouseUp(e) {
           document.body.appendChild(iDiv);
           $( "#tempID" ).fadeIn(1000);
           //
-          console.log($( "#tempID" )[0]);
           var textoBancada = " STAR WARS \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
           var textoDestiny = " DESTINY \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
           var textoFIFA = " COD \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
           var textoDisney = " PSVR \n Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque urna nec eros ornare, ac tristique diam porta. Donec fermentum velit eget dignissim condimentum. Sed rutrum libero sit amet enim viverra tristique. Mauris ultricies ornare arcu non adipiscing. Sed id ipsum vitae libero facilisis pulvinar id nec lacus. Ut lobortis neque et luctus mattis. Morbi nunc diam, elementum rutrum tellus non, viverra mattis diam. Vestibulum sed arcu tincidunt, auctor ligula ut, feugiat nisi. Phasellus adipiscing eros ut iaculis sagittis. Sed posuere vehicula elit vel tincidunt. Duis feugiat feugiat libero bibendum consectetur. Ut in felis non nisl egestas lacinia. Fusce interdum vitae nunc eget elementum. Quisque dignissim luctus magna et elementum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed nunc lorem, convallis consequat fermentum eget, aliquet sit amet libero.";
-          console.log(clickedObject.name);
           if(clickedObject.name.indexOf("OBJ_SW") > -1)
           iDiv.innerHTML = textoBancada;
           else if(clickedObject.name.indexOf("OBJ_Dest") > -1)
@@ -430,9 +433,9 @@ function onMouseUp(e) {
       {
         controls.autoRotate = false;
         $( "#tempID" ).fadeOut(1000);
-        var selectedObject = scene.getObjectByName("Ground",true);
-        setupTweenOut(selectedObject.geometry.centroid.x,selectedObject.geometry.centroid.y+1500,selectedObject.geometry.centroid.z,selectedObject);
-        controls.target = new THREE.Vector3(selectedObject.geometry.centroid.x+50, selectedObject.geometry.centroid.y, selectedObject.geometry.centroid.z+50);
+        //var selectedObject = scene.getObjectByName("Ground",true);
+        setupTweenOut(sceneCentroid.x,sceneCentroid.y+1500,sceneCentroid.z,selectedObject);
+        controls.target = new THREE.Vector3(sceneCentroid.x+50, sceneCentroid.y, sceneCentroid.z+50);
         objectSelected = false;
         document.addEventListener( 'mousemove', onDocumentMouseMove, false );
       }
@@ -557,12 +560,11 @@ function loadScene() {
 
   pathArrayReplacersMixName = ['models/VRSTAND/Replacers/IDU/OBJ_REP_IDU'];
 
-  var destiny = new THREE.Object3D();
   pathArrayReplacersDestiny = ['models/VRSTAND/Dest/PC_DEST_Bancos']
 
   pathArrayReplacersDestinyName = ['models/VRSTAND/Replacers/Banco/chairsw'];
 
-
+  var destiny = new THREE.Object3D();
   for(i = 0 ; i<pathArrayJSDestiny.length ; i++)
   {
     destiny = loadObjectJSON(pathArrayJSDestiny[i],destiny);
@@ -605,17 +607,17 @@ function loadScene() {
 
   var plateia = new THREE.Object3D();
 
-  for(i = 0 ; i<pathArrayJSPlateia.length ; i++)
+  /*for(i = 0 ; i<pathArrayJSPlateia.length ; i++)
   {
     plateia = loadObjectJSON(pathArrayJSPlateia[i],plateia);
-  }
+  }*/
 
   var gd = new THREE.Object3D();
 
-  for(i = 0 ; i<pathArrayJSGD.length ; i++)
+  /*for(i = 0 ; i<pathArrayJSGD.length ; i++)
   {
     gd = loadObjectJSON(pathArrayJSGD[i],gd);
-  }
+  }*/
 
   for(i = 0 ; i<pathArrayReplacersFIFA.length ; i++)
   {
@@ -662,9 +664,6 @@ function loadScene() {
     destiny = loadReplacersWithPointCloud(pathArrayReplacersDestiny[i],pathArrayReplacersDestinyName[i],destiny);
   }
 
-
-
-
     interactiveObjectGroup.add(destiny);
     interactiveObjectGroup.add(cod);
     interactiveObjectGroup.add(liga);
@@ -674,32 +673,6 @@ function loadScene() {
     interactiveObjectGroup.add(plateia);
     interactiveObjectGroup.add(gd);
     ///interactiveObjectGroup.add(fifa);
-
-    console.log(destiny);
-
-    singleGeometry = new THREE.Geometry();
-    for(var i=0; i<destiny.length; i++)
-    singleGeometry.merge(destiny[i].geometry, destiny[i].matrix);
-    for(var i=0; i<cod.length; i++)
-    singleGeometry.merge(cod[i].geometry, cod[i].matrix);
-    for(var i=0; i<liga.length; i++)
-    singleGeometry.merge(liga[i].geometry, liga[i].matrix);
-    for(var i=0; i<psvr.length; i++)
-    singleGeometry.merge(psvr[i].geometry, psvr[i].matrix);
-    for(var i=0; i<mix.length; i++)
-    singleGeometry.merge(mix[i].geometry, mix[i].matrix);
-    for(var i=0; i<sw.length; i++)
-    singleGeometry.merge(sw[i].geometry, sw[i].matrix);
-    for(var i=0; i<plateia.length; i++)
-    singleGeometry.merge(plateia[i].geometry, plateia[i].matrix);
-    for(var i=0; i<gd.length; i++)
-    singleGeometry.merge(gd[i].geometry, gd[i].matrix);
-
-    console.log(singleGeometry);
-
-    var meshSG = new THREE.Mesh(singleGeometry, new THREE.MeshNormalMaterial());
-    meshSG.name = "singleGeometryNormal";
-    scene.add(meshSG);
 }
 
 function loadObject(path) {
@@ -736,13 +709,16 @@ function loadObjectJSON(path,objectGroup) {
     }
 
     var mesh = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial(materials));
-    //mesh.castShadow = true;
-    //mesh.receiveShadow = true;
+
     mesh.name = path;
     objectGroup.name = path+"-Name";
-    objectGroup.add(mesh);
 
+    if (materials[0].type == "MultiMaterial")
+        singleGeometryMaterials[mesh.id] = materials[0].materials[0];
+    else
+        singleGeometryMaterials[mesh.id] = materials[0];
 
+    singleGeometry.merge(mesh.geometry,mesh.matrix,mesh.id);
 
   },// Function called when downloads progress
   function ( xhr ) {
@@ -758,35 +734,48 @@ function loadObjectJSON(path,objectGroup) {
 
 function loadGround() {
 
-  var groundGeo = new THREE.PlaneBufferGeometry( 100000, 100000 );
+  var groundGeo = new THREE.PlaneGeometry( 100000, 100000 );
 
   var groundMat = new THREE.MeshBasicMaterial( { color: 0x000000} );
   groundMat.color.set(0xaeadb8);
-  //groundMat.map = groundTexture ;
 
   var ground = new THREE.Mesh( groundGeo, groundMat );
   ground.rotation.x = -Math.PI/2;
   ground.position.y = -33;
-  scene.add( ground );
+
+  ground.updateMatrix();
+
+  singleGeometryMaterials.push(groundMat);
+
+  singleGeometry.merge(ground.geometry, ground.matrix,0);
 
   loader = new THREE.JSONLoader();
   loader.load( "models/VRSTAND/Fundo/Fundo.js", function( geometry,materials ) {
+
+    singleGeometryMaterials.push(materials[0]);
+
     var fundo = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
     fundo.name = "Fundo";
-    scene.add( fundo );
+
+    singleGeometry.merge(fundo.geometry, fundo.matrix,1);
   });
 
   loader = new THREE.JSONLoader();
   loader.load( "models/VRSTAND/Ground/OBJ_Ground.js", function( geometry,materials ) {
 
+    singleGeometryMaterials.push(materials[0]);
+
     var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
     mesh.name = "Ground";
-    scene.add( mesh );
+
+    singleGeometry.merge(mesh.geometry, mesh.matrix,2);
 
     groundHeight = mesh.position.y;
     ground.position.y = groundHeight-30;
 
     getCentroid(mesh);
+
+    sceneCentroid = mesh.geometry.centroid;
 
     var centroid = new THREE.Vector3();
     mesh.geometry.computeBoundingBox();
@@ -827,7 +816,11 @@ function loadGround() {
     var skyGeo = new THREE.SphereGeometry(iSBrsize, 32, 32);
     skyMat = new THREE.ShaderMaterial({vertexShader: sbVertexShader, fragmentShader: sbFragmentShader, uniforms: uniforms, side: THREE.DoubleSide, fog: false});
     skyMesh = new THREE.Mesh(skyGeo, skyMat);
-    this.scene.add(skyMesh);
+
+    singleGeometryMaterials.push(skyMat);
+
+    singleGeometry.merge(skyMesh.geometry,skyMesh.matrix,3);
+
   });
 }
 
@@ -854,11 +847,19 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup) {
   light.position.z = normalVector.z;
   light.lookAt(normalVector);
 
+  var meshID = [];
+
   var loaderOBJ = new THREE.OBJMTLLoader();
   loaderOBJ.load( replacerPath+'.obj', replacerPath+'.mtl', function ( object ) {
     object.traverse(function(child) {
 
       if (child instanceof THREE.Mesh) {
+
+        if(meshID.indexOf(child.id) != 0 )
+        {
+          meshID.push(child.id);
+        }
+
         for(i=0; i<meshPointCloud.geometry.vertices.length; i++){
 
           var vertex = meshPointCloud.geometry.vertices[i];
@@ -881,7 +882,6 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup) {
 
           if(replacerPath.indexOf("OBJ_REP_Truss") > -1)
           {
-            console.log("truss");
             newObject.scale.set(1.05,1,1);
           }
 
@@ -920,7 +920,10 @@ function loadReplacersWithPointCloud(pointCloudPath,replacerPath,objectGroup) {
           newObject.updateMatrix();
 
           newObject.name = replacerPath;
-          objectGroup.add(newObject);
+
+          singleGeometryMaterials[child.id] = child.material;
+          singleGeometry.merge(newObject.geometry,newObject.matrix,child.id);
+
         }
       }
     });
@@ -1030,6 +1033,9 @@ function endOfTweenIn(x,y,z) {
 
 THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
   if(loaded == total) {
+
+    mergeAllGeometry();
+
     // create the main selection menu
     var iDiv = document.createElement('div');
     //iDiv.innerHTML = " Cadeiras seleccionadas : ";
@@ -1065,6 +1071,8 @@ THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
       init();
     });
     isLoading = false;
+
+
 
   }
 };
@@ -1134,4 +1142,12 @@ function TextureAnimator(texture, tilesHoriz, tilesVert, numTiles, tileDispDurat
       texture.offset.y = currentRow / this.tilesVertical;
     }
   };
+}
+
+function mergeAllGeometry()
+{
+  var meshSG = new THREE.Mesh(singleGeometry, new THREE.MeshFaceMaterial(singleGeometryMaterials));
+  meshSG.name = "singleGeometryNormal";
+  scene.add(meshSG);
+
 }
