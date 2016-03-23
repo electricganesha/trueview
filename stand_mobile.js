@@ -63,7 +63,7 @@ $.ajax({
 
 $.ajax({
   type: "GET",
-  url: "js/vreticle.js",
+  url: "js/reticulum.js",
   dataType: "script",
   async: false
 });
@@ -170,6 +170,53 @@ THREE.DeviceOrientationControls = function ( object ) {
       firstAlpha = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.alpha ) : 90;
       firstIn = true;
     }
+
+    var outlineMeshObject = new THREE.Object3D();
+
+    var childrenSize = 0;
+
+    var mouse2 = new THREE.Vector2();
+    var raycaster = new THREE.Raycaster();
+
+    mouse2.x = 2 * ((window.innerWidth/2) / window.innerWidth) - 1;
+    mouse2.y = 1 - 2 * ((window.innerHeight/2) / window.innerHeight);
+
+    raycaster.setFromCamera( mouse2, camera );
+
+    var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
+
+    var selectedObject = scene.getObjectByName("temporaryOutlineMesh");
+    while ( selectedObject != undefined ) {
+      scene.remove( scene.getObjectByName('temporaryOutlineMesh',true) );
+      selectedObject = scene.getObjectByName('temporaryOutlineMesh');
+    }
+
+    for( var i = 0; i < intersects.length; i++ ) {
+      var intersection = intersects[ i ],
+      obj = intersects[ 0 ].object.parent;
+
+      var outlineMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00, opacity:0.2, transparent:true } );
+
+      noneSelected = true;
+
+      obj.traverse(function(child) {
+        childrenSize = obj.children.length;
+        if (child instanceof THREE.Mesh && noneSelected) {
+          var outlineMesh = child.clone();
+          outlineMesh.material = outlineMaterial;
+
+          outlineMeshObject.name = "temporaryOutlineMesh";
+
+          if(childrenSize != outlineMeshObject.children.length)
+          outlineMeshObject.add( outlineMesh);
+
+          if(childrenSize == outlineMeshObject.children.length)
+          noneSelected=false;
+        }
+      });
+      if(childrenSize == outlineMeshObject.children.length)
+      scene.add(outlineMeshObject);
+    }
   };
 
   var onScreenOrientationChangeEvent = function () {
@@ -236,7 +283,6 @@ THREE.DeviceOrientationControls = function ( object ) {
 };
 
 scene.fog = new THREE.FogExp2( 0x000000, 0.00001 );
-//scene.fog.color.setHSL( 0.6, 0, 1 );
 
 renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio( window.devicePixelRatio );
@@ -439,7 +485,6 @@ function fullscreen() {
   }
 }
 
-
 function onDocumentMouseMove( e ) {
 
   mouseState = 0;
@@ -454,9 +499,6 @@ function onDocumentMouseMove( e ) {
 
   var mouse = new THREE.Vector2();
   var raycaster = new THREE.Raycaster();
-
-  //mouse.x = ( event.clientX - windowHalfX ) / 2;
-  //mouse.y = ( event.clientY - windowHalfY ) / 2;
 
   mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
   mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
@@ -503,8 +545,6 @@ function onDocumentMouseMove( e ) {
 
 }
 
-// Mouse Click Event
-
 function onMouseDown(e) {
   mouseState = 1;
 }
@@ -527,9 +567,15 @@ function onMouseUp(e) {
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
 
-        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
-        mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
-        raycaster.setFromCamera( mouse, camera );
+        if (isVR == true){
+          mouse.x = 2 * ((window.innerWidth/2) / window.innerWidth) - 1;
+          mouse.y = 1 - 2 * ((window.innerHeight/2) / window.innerHeight);
+          raycaster.setFromCamera( mouse, camera );
+        }else{
+          mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
+          mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
+          raycaster.setFromCamera( mouse, camera );
+        }
         var selectMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1, wireframe: true} );
         var intersects = raycaster.intersectObjects( interactiveObjectGroup.children, true );
         // if there is one (or more) intersections
@@ -844,17 +890,16 @@ function loadObject(path) {
   var loaderOBJ = new THREE.OBJMTLLoader();
   loaderOBJ.load( path+'.obj', path+'.mtl', function ( object ) {
     bancada.add(object);
-    //}
-    //});
+  }),
 
-  },// Function called when downloads progress
+  // Function called when downloads progress
   function ( xhr ) {
     console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
   },
   // Function called when downloads error
   function ( xhr ) {
     console.log( 'An error happened' );
-  });
+  }
 }
 
 function loadObjectJSON(path,objectGroup) {
@@ -1295,7 +1340,35 @@ function switchToVr() {
     controls = new THREE.DeviceOrientationControls(camera);
     controls.connect();
     animateVr();
-    var reticle = vreticle.Reticle(camera);
+    Reticulum.init(camera, {
+        proximity: false,
+        clickevents: true,
+        near: null, //near factor of the raycaster (shouldn't be negative and should be smaller than the far property)
+        far: null, //far factor of the raycaster (shouldn't be negative and should be larger than the near property)
+        reticle: {
+            visible: true,
+            restPoint: 1000, //Defines the reticle's resting point when no object has been targeted
+            color: 0xcc0000,
+            innerRadius: 0.0001,
+            outerRadius: 0.003,
+            hover: {
+                color: 0xcc0000,
+                innerRadius: 0.02,
+                outerRadius: 0.024,
+                speed: 5,
+                vibrate: 50 //Set to 0 or [] to disable
+            }
+        },
+        fuse: {
+            visible: true,
+            duration: 2.5,
+            color: 0x00fff6,
+            innerRadius: 0.045,
+            outerRadius: 0.06,
+            vibrate: 100, //Set to 0 or [] to disable
+            clickCancelFuse: false //If users clicks on targeted object fuse is canceled
+        }
+    });
     currentScene.add(camera);
 
   }
